@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>노래 목록</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }
+        h1 { color: #333; }
+        form { margin-bottom: 20px; }
+        input[type="text"] { width: 300px; padding: 5px; margin-right: 10px; }
+        input[type="submit"], button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; }
+        a { color: #1a0dab; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .delete-btn { background-color: #f44336; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <h1>노래 추가</h1>
+    <form id="addSongForm">
+        <input type="text" id="title" placeholder="노래 제목" required>
+        <input type="text" id="youtube_link" placeholder="유튜브 링크" required>
+        <input type="submit" value="추가">
+    </form>
+
+    <h2>노래 목록</h2>
+    <ul id="songList"></ul>
+
+    <script>
+        // 노래 목록 가져오기
+        function fetchSongs() {
+            fetch('/api/songs')
+                .then(response => response.json())
+                .then(songs => {
+                    const songList = document.getElementById('songList');
+                    songList.innerHTML = '';
+                    songs.forEach(song => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            ${song.title} - 
+                            <a href="${song.youtube_link}" target="_blank">유튜브 링크</a>
+                            <button class="delete-btn" onclick="deleteSong(${song.id})">삭제</button>
+                        `;
+                        songList.appendChild(li);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // 노래 추가
+        document.getElementById('addSongForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const youtube_link = document.getElementById('youtube_link').value;
+            fetch('/api/songs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title, youtube_link }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                fetchSongs();
+                document.getElementById('title').value = '';
+                document.getElementById('youtube_link').value = '';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+
+        // 노래 삭제
+        function deleteSong(id) {
+            fetch(`/api/songs/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if(response.ok) {
+                    console.log('Song deleted successfully');
+                    fetchSongs();
+                } else {
+                    console.error('Delete failed');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        // 초기 노래 목록 로드
+        fetchSongs();
+    </script>
+</body>
+</html>
