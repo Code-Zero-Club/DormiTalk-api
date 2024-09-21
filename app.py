@@ -61,6 +61,17 @@ def get_song(id):
     song = Song.query.get_or_404(id)
     return song_schema.jsonify(song)
 
+# 노래 재생 수 설정 기능
+@app.route('/play', methods=['GET'])
+def play_songs():
+    try:
+        num_songs = int(request.args.get('num', 10))  # 기본값으로 10곡을 설정
+    except ValueError:
+        return jsonify({"error": "Invalid number of songs"}), 400
+    
+    songs = Song.query.limit(num_songs).all()
+    return render_template('play.html', songs=songs)
+
 @app.route('/api/songs/<int:id>', methods=['PUT'])
 def update_song(id):
     song = Song.query.get_or_404(id)
@@ -87,13 +98,3 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
-# 노래 재생 수 설정
-@app.route('/play', methods=['GET'])
-def play_songs():
-    try:
-        num_songs = int(request.args.get('num', 10))  # 기본값으로 10곡을 설정
-    except ValueError:
-        return jsonify({"error": "Invalid number of songs"}), 400
-    
-    songs = Song.query.limit(num_songs).all()
-    return render_template('play.html', songs=songs)
