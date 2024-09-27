@@ -2,12 +2,18 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow import ValidationError
+from datetime import datetime
+import random
+import string
+
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///songs.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config.from_pyfile('config.py')
+
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
 
 class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,6 +22,7 @@ class Song(db.Model):
 
     def __repr__(self):
         return f'<Song {self.title}>'
+
 
 class SongSchema(ma.Schema):
     class Meta:
@@ -38,7 +45,6 @@ def add_song_web():
     db.session.commit()
     return redirect(url_for('index'))
 
-# API routes
 @app.route('/api/songs', methods=['POST'])
 def add_song_api():
     try:
@@ -61,17 +67,6 @@ def get_song(id):
     song = Song.query.get_or_404(id)
     return song_schema.jsonify(song)
 
-# 노래 재생 수 설정 기능
-@app.route('/play', methods=['GET'])
-def play_songs():
-    try:
-        num_songs = int(request.args.get('num', 10))  # 기본값으로 10곡을 설정
-    except ValueError:
-        return jsonify({"error": "Invalid number of songs"}), 400
-    
-    songs = Song.query.limit(num_songs).all()
-    return render_template('play.html', songs=songs)
-
 @app.route('/api/songs/<int:id>', methods=['PUT'])
 def update_song(id):
     song = Song.query.get_or_404(id)
@@ -93,6 +88,34 @@ def delete_song(id):
     db.session.delete(song)
     db.session.commit()
     return '', 204
+
+
+class LoginKey(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(20), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+def generate_random_key(length=20):
+    letters_and_digits = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters_and_digits) for i in range(length))
+
+@app.route('/api/generate_key', methods=['POST'])
+def generate_key():
+    new_key = generate_random_key()
+    login_key = LoginKey(key=new_key)
+    db.session.add(login_key)
+    db.session.commit()
+    return jsonify({"key": new_key}), 201
+
+@app.route('/api/validate_key', methods=['POST'])
+def validate_key():
+    key = request.json.get('key')
+    login_key = LoginKey.query.filter_by(key=key).first()
+    if login_key:
+        return jsonify({"message": "Valid key"}), 200
+    else:
+        return jsonify({"message": "Invalid key"}), 401
+
 
 if __name__ == '__main__':
     with app.app_context():
