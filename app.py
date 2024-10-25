@@ -9,10 +9,12 @@ import sqlite3
 import secrets
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///songs.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config.from_pyfile('config.py')
+
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
 
 class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,6 +23,7 @@ class Song(db.Model):
 
     def __repr__(self):
         return f'<Song {self.title}>'
+
 
 class SongSchema(ma.Schema):
     class Meta:
