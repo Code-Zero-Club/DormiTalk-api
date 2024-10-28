@@ -1,0 +1,20 @@
+project/
+├── app/
+│   ├── __init__.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── auth.py
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── routes.py
+│   ├── web/
+│   │   ├── __init__.py
+│   │   └── routes.py
+│   └── templates/
+│       ├── index.html
+│       └── play.html
+├── instance/
+│   └── database.db
+├── config.py
+├── run.py
+└── requirements.txt
