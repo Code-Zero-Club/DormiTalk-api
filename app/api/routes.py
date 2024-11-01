@@ -15,13 +15,18 @@ admin_key_schema = AdminKeySchema()
 @bp.route('/songs', methods=['GET'])
 def get_songs():
     songs = Song.query.all()
-    return jsonify(songs_schema.dump(songs))
+    result = songs_schema.dump(songs)
+    for song in result:
+        song['last_modified'] = song['last_modified'].isoformat() if song['last_modified'] else None
+    return jsonify(result)
 
 
 @bp.route('/songs/<int:id>', methods=['GET'])
 def get_song(id):
     song = Song.query.get_or_404(id)
-    return song_schema.jsonify(song)
+    result = song_schema.dump(song)
+    result['last_modified'] = song.last_modified.isoformat() if song.last_modified else None
+    return jsonify(result)
 
 
 @bp.route('/songs', methods=['POST'])
