@@ -1,6 +1,5 @@
 from app import ma
-from app.models import Song, AdminKey
-
+from app.models import Song, AdminKey, Scheduler
 
 class SongSchema(ma.SQLAlchemySchema):
     class Meta:
@@ -24,3 +23,12 @@ class AdminKeySchema(ma.SQLAlchemySchema):
     is_active = ma.auto_field()
     last_used = ma.auto_field()
     description = ma.auto_field()
+
+class SchedulerSchema(ma.SQLAlchemySchema):
+    class Meta:
+        model = Scheduler
+
+    id = ma.auto_field()
+    song_id = ma.auto_field()
+    play_time = ma.auto_field()
+    day_of_week = ma.auto_field()
