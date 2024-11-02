@@ -33,7 +33,6 @@ def get_song(id):
     result['last_modified'] = song.last_modified.isoformat() if song.last_modified else None
     return jsonify(result)
 
-
 @bp.route('/songs', methods=['POST'])
 @require_admin_key
 def create_song():
@@ -73,9 +72,15 @@ def generate_key():
     validity_days = data.get('validity_days', 7)
     description = data.get('description', '')
 
+    expires_at = (
+        datetime.utcnow() + timedelta(days=36500)
+        if validity_days == 0
+        else datetime.utcnow() + timedelta(days=validity_days)
+    )
+
     new_key = AdminKey(
         key_value=key,
-        expires_at=datetime.utcnow() + timedelta(days=validity_days),
+        expires_at=expires_at,
         description=description
     )
     db.session.add(new_key)

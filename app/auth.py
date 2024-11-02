@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import request, jsonify
+from app import db
 from app.models import AdminKey
 from datetime import datetime
 
