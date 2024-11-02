@@ -25,7 +25,6 @@ def get_songs():
         song['last_modified'] = song['last_modified'].isoformat() if song['last_modified'] else None
     return jsonify(result)
 
-
 @bp.route('/songs/<int:id>', methods=['GET'])
 def get_song(id):
     song = Song.query.get_or_404(id)
@@ -45,6 +44,7 @@ def create_song():
     db.session.commit()
     return song_schema.jsonify(new_song), 201
 
+
 @bp.route('/schedulers', methods=['POST'])
 @require_admin_key
 def create_scheduler():
@@ -58,12 +58,23 @@ def create_scheduler():
     db.session.commit()
     return scheduler_schema.jsonify(new_scheduler), 201
 
-
 @bp.route('/schedulers', methods=['GET'])
 def get_schedulers():
     schedulers = Scheduler.query.all()
     return schedulers_schema.jsonify(schedulers), 200
 
+
+@bp.route('/auth/key', methods=['GET'])
+def check_key():
+    key = request.args.get('key')
+    if not key:
+        return jsonify({'error': 'Key is required'}), 400
+
+    admin_key = AdminKey.query.filter_by(key_value=key).first()
+    if admin_key and admin_key.is_active and admin_key.expires_at > datetime.utcnow():
+        return jsonify({'message': 'Key is valid'}), 200
+    else:
+        return jsonify({'error': 'Invalid or expired key'}), 401
 
 @bp.route('/admin/key', methods=['POST'])
 def generate_key():
