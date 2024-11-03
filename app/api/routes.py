@@ -50,18 +50,32 @@ def create_song():
 def create_scheduler():
     data = request.get_json()
     new_scheduler = Scheduler(
-        song_id=data['song_id'],
-        play_time=datetime.strptime(data['play_time'], '%H:%M:%S').time(),
-        day_of_week=data['day_of_week']
+        start_time=datetime.strptime(data['start_time'], '%H:%M:%S').time(),
+        day_of_week=','.join(data['day_of_week']),
+        play_time=datetime.strptime(data['play_time'], '%H:%M:%S').time()
     )
     db.session.add(new_scheduler)
     db.session.commit()
     return scheduler_schema.jsonify(new_scheduler), 201
 
+@bp.route('/schedulers/<int:id>', methods=['PUT'])
+@require_admin_key
+def update_scheduler(id):
+    data = request.get_json()
+    scheduler = Scheduler.query.get_or_404(id)
+    scheduler.start_time = datetime.strptime(data['start_time'], '%H:%M:%S').time()
+    scheduler.day_of_week = ','.join(data['day_of_week'])
+    scheduler.play_time = datetime.strptime(data['play_time'], '%H:%M:%S').time()
+    db.session.commit()
+    return scheduler_schema.jsonify(scheduler), 200
+
 @bp.route('/schedulers', methods=['GET'])
 def get_schedulers():
     schedulers = Scheduler.query.all()
-    return schedulers_schema.jsonify(schedulers), 200
+    result = schedulers_schema.dump(schedulers)
+    for scheduler in result:
+        scheduler['day_of_week'] = scheduler['day_of_week'].split(',')
+    return jsonify(result), 200
 
 
 @bp.route('/auth/key', methods=['GET'])

@@ -29,6 +29,6 @@ class SchedulerSchema(ma.SQLAlchemySchema):
         model = Scheduler
 
     id = ma.auto_field()
-    song_id = ma.auto_field()
-    play_time = ma.auto_field()
+    start_time = ma.auto_field()
     day_of_week = ma.auto_field()
+    play_time = ma.auto_field()

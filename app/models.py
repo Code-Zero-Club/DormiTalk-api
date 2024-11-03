@@ -24,8 +24,6 @@ class AdminKey(db.Model):
 
 class Scheduler(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    song_id = db.Column(db.Integer, db.ForeignKey('song.id'), nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    day_of_week = db.Column(db.String, nullable=False)
     play_time = db.Column(db.Time, nullable=False)
-    day_of_week = db.Column(db.String(10), nullable=False)
-
-    song = db.relationship('Song', backref=db.backref('schedules', lazy=True))
