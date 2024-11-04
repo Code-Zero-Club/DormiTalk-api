@@ -7,7 +7,6 @@ class Song(db.Model):
     title = db.Column(db.String(100), nullable=False)
     youtube_link = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    last_modified = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return f'<Song {self.title}>'
