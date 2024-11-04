@@ -1,0 +1,1 @@
+"C:\cloudflared" tunnel --url localhost:5000
