@@ -27,3 +27,4 @@ class Scheduler(db.Model):
     start_time = db.Column(db.Time, nullable=False)
     day_of_week = db.Column(db.String, nullable=False)
     play_time = db.Column(db.Time, nullable=False)
+    last_modified = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

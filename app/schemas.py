@@ -32,3 +32,4 @@ class SchedulerSchema(ma.SQLAlchemySchema):
     start_time = ma.auto_field()
     day_of_week = ma.auto_field()
     play_time = ma.auto_field()
+    last_modified = ma.auto_field()
