@@ -1,0 +1,41 @@
+name: Deploy to OCI
+on:
+  workflow_dispatch:
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy with rsync
+        run: rsync -avz ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/dormitalk-api/
+
+      - name: Sync src with rsync
+        run: rsync -avz ./app/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/dormitalk-api/app/ --delete-after
+
+      - name: Deploy Flask API
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/dormitalk-api
+            
+            python3 -m venv venv
+            source venv/bin/activate
+            
+            pip install -r requirements.txt
+            
+            pm2 delete dormitalk-api || true
+            pm2 start "gunicorn -w 4 -b 0.0.0.0:5000 app.wsgi:app" --name dormitalk-api
