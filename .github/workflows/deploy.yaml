@@ -38,4 +38,4 @@ jobs:
             pip install -r requirements.txt
             
             pm2 delete dormitalk-api || true
-            pm2 start app/main.py --name dormitalk-api --interpreter python3
+            pm2 start app/run.py --name dormitalk-api --interpreter python3
