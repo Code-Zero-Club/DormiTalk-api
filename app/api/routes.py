@@ -35,7 +35,7 @@ def create_song():
     data = request.get_json()
     new_song = Song(
         title=data['title'],
-        youtube_link=data['youtube_link']
+        youtube_id=data['youtube_id']
     )
     db.session.add(new_song)
     db.session.commit()

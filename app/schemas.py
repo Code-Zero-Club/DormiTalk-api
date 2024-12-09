@@ -7,7 +7,7 @@ class SongSchema(ma.SQLAlchemySchema):
 
     id = ma.auto_field()
     title = ma.auto_field()
-    youtube_link = ma.auto_field()
+    youtube_id = ma.auto_field()
     created_at = ma.auto_field()
 
 song_schema = SongSchema()
