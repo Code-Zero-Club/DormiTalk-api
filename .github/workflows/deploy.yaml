@@ -46,7 +46,7 @@ jobs:
             
             sleep 3
             
-            cd ~/dormitalk-api && pm2 start app/run.py \
+            cd ~/dormitalk-api && pm2 start run.py \
               --name dormitalk-api \
               --interpreter ./venv/bin/python3 \
               --time \
