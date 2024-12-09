@@ -32,10 +32,25 @@ jobs:
           script: |
             cd ~/dormitalk-api
             
+            [ -d "venv" ] && rm -rf venv
+            
             python3 -m venv venv
-            source venv/Scripts/activate
             
-            pip install -r requirements.txt
+            source venv/bin/activate || exit 1
             
-            pm2 delete dormitalk-api || true
-            pm2 start app/run.py --name dormitalk-api --interpreter python3
+            python3 -m pip install --upgrade pip
+            
+            pip install -r requirements.txt || exit 1
+            
+            pm2 delete dormitalk-api 2>/dev/null || true
+            
+            sleep 3
+            
+            cd ~/dormitalk-api && pm2 start app/run.py \
+              --name dormitalk-api \
+              --interpreter ./venv/bin/python3 \
+              --time \
+              --max-memory-restart 500M \
+              || exit 1
+            
+            pm2 status
