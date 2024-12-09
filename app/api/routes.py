@@ -41,6 +41,14 @@ def create_song():
     db.session.commit()
     return song_schema.jsonify(new_song), 201
 
+@bp.route('/songs/<int:id>', methods=['DELETE'])
+@require_admin_key
+def delete_song(id):
+    song = Song.query.get_or_404(id)
+    db.session.delete(song)
+    db.session.commit()
+    return '', 204
+
 
 @bp.route('/schedulers', methods=['POST'])
 @require_admin_key
