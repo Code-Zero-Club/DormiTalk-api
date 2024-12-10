@@ -58,7 +58,7 @@ def create_scheduler():
     new_scheduler = Scheduler(
         start_time=datetime.strptime(data['start_time'], '%H:%M:%S').time(),
         day_of_week=','.join(data['day_of_week']),
-        play_time=datetime.strptime(data['play_time'], '%H:%M:%S').time()
+        play_time=data['play_time']
     )
     db.session.add(new_scheduler)
     db.session.commit()
