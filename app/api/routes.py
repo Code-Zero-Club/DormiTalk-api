@@ -96,25 +96,25 @@ def check_key():
     else:
         return jsonify({'error': 'Invalid or expired key'}), 401
 
-@bp.route('/admin/key', methods=['POST'])
-def generate_key():
-    data = request.get_json()
-    key = secrets.token_hex(32)
-    validity_days = data.get('validity_days', 7)
-    description = data.get('description', '')
-
-    expires_at = (
-        datetime.utcnow() + timedelta(days=36500)
-        if validity_days == 0
-        else datetime.utcnow() + timedelta(days=validity_days)
-    )
-
-    new_key = AdminKey(
-        key_value=key,
-        expires_at=expires_at,
-        description=description
-    )
-    db.session.add(new_key)
-    db.session.commit()
-
-    return admin_key_schema.jsonify(new_key), 201
+# @bp.route('/admin/key', methods=['POST'])
+# def generate_key():
+#     data = request.get_json()
+#     key = secrets.token_hex(32)
+#     validity_days = data.get('validity_days', 7)
+#     description = data.get('description', '')
+#
+#     expires_at = (
+#         datetime.utcnow() + timedelta(days=36500)
+#         if validity_days == 0
+#         else datetime.utcnow() + timedelta(days=validity_days)
+#     )
+#
+#     new_key = AdminKey(
+#         key_value=key,
+#         expires_at=expires_at,
+#         description=description
+#     )
+#     db.session.add(new_key)
+#     db.session.commit()
+#
+#     return admin_key_schema.jsonify(new_key), 201
