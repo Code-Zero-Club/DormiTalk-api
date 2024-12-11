@@ -92,7 +92,11 @@ def check_key():
 
     admin_key = AdminKey.query.filter_by(key_value=key).first()
     if admin_key and admin_key.is_active and admin_key.expires_at > datetime.utcnow():
-        return jsonify({'message': 'Key is valid'}), 200
+        return jsonify({
+            'message': 'Key is valid',
+            'description': admin_key.description,
+            'expires_at': admin_key.expires_at.isoformat()
+        }), 200
     else:
         return jsonify({'error': 'Invalid or expired key'}), 401
 
