@@ -71,7 +71,7 @@ def update_scheduler(id):
     scheduler = Scheduler.query.get_or_404(id)
     scheduler.start_time = datetime.strptime(data['start_time'], '%H:%M:%S').time()
     scheduler.day_of_week = ','.join(data['day_of_week'])
-    scheduler.play_time = datetime.strptime(data['play_time'], '%H:%M:%S').time()
+    scheduler.play_time = data['play_time']
     db.session.commit()
     return scheduler_schema.jsonify(scheduler), 200
 
