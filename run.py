@@ -2,7 +2,7 @@ from flask_cors import CORS
 from app import create_app, db
 
 app = create_app()
-CORS(app, resources={r'*': {'origins': 'https://dormitalk.codezero.lol'}})
+CORS(app)
 
 if __name__ == '__main__':
     with app.app_context():
